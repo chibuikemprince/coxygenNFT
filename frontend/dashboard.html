@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NFT Dashboard</title>
+    <script src="./js/env.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .profile {
+        display: flex;
+        align-items: center;
+      }
+      .profile-pic {
+        width: 40px;
+        height: 40px;
+        background: #007bff;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      .nav {
+        margin: 20px 0;
+      }
+      .nav button {
+        margin-right: 10px;
+        padding: 10px 15px;
+        border: none;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      .section {
+        display: none;
+        padding: 20px;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .active {
+        display: block;
+      }
+      .nft {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        background: #f9f9f9;
+        display: flex;
+        align-items: center;
+      }
+      .nft img {
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
+        margin-right: 10px;
+      }
+      .nft button {
+        margin-left: auto;
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="profile">
+        <div class="profile-pic" id="profile_pic"></div>
+        <div id="wallet_address"></div>
+        <!--- <div id="wallet_balance">Ada Balance: 250.00</div> -->
+      </div>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="nav">
+      <button onclick="showSection('nftsForSale')">NFTs for Sale</button>
+      <button onclick="showSection('ownedNFTs')">Owned NFTs</button>
+      <button onclick="showSection('mintNFT')">Mint NFT</button>
+    </div>
+
+    <div id="nftsForSale" class="section active">
+      <h2>NFTs for Sale</h2>
+      <div class="nft">
+        <img src="https://via.placeholder.com/100" alt="NFT 1" />
+        <div>NFT Name 1</div>
+        <button>Buy</button>
+      </div>
+      <div class="nft">
+        <img src="https://via.placeholder.com/100" alt="NFT 2" />
+        <div>NFT Name 2</div>
+        <button>Buy</button>
+      </div>
+      <div class="nft">
+        <img src="https://via.placeholder.com/100" alt="NFT 3" />
+        <div>NFT Name 3</div>
+        <button>Buy</button>
+      </div>
+    </div>
+
+    <div id="ownedNFTs" class="section">
+      <h2>Your Owned NFTs</h2>
+      <div class="nft">
+        <img src="https://via.placeholder.com/100" alt="Owned NFT 1" />
+        <div>Owned NFT Name 1</div>
+        <button>For Sale</button>
+        <button>Lock</button>
+        <button>Update</button>
+      </div>
+      <div class="nft">
+        <img src="https://via.placeholder.com/100" alt="Owned NFT 2" />
+        <div>Owned NFT Name 2</div>
+        <button>For Sale</button>
+        <button>Lock</button>
+        <button>Update</button>
+      </div>
+    </div>
+
+    <div id="mintNFT" class="section">
+      <h2>Mint a New NFT</h2>
+      <div>
+        <input type="text" placeholder="NFT Name" />
+        <button>Mint</button>
+      </div>
+    </div>
+
+    <script>
+      function showSection(sectionId) {
+        const sections = document.querySelectorAll(".section");
+        sections.forEach((section) => {
+          section.classList.remove("active");
+        });
+        document.getElementById(sectionId).classList.add("active");
+      }
+
+      function logout() {
+        window.location = "/";
+      }
+    </script>
+    <script type="module">
+      import {
+        Blockfrost,
+        Lucid,
+      } from "https://unpkg.com/lucid-cardano/web/mod.js";
+
+      // Initialize Lucid with Blockfrost
+
+      async function checkUserEndpoint(walletadress) {
+        fetch(env.BASE_URL + "/users/" + walletadress)
+          .then(async (response) => {
+            console.log({
+              response,
+              status: response.status,
+              response_d: response.data,
+            });
+            if (response.status != 200) {
+              window.location.href = "reg.html";
+            }
+            let result = await response.json();
+            console.log({ result });
+            let name = result.data.name;
+            let walletAddress = walletadress;
+            document.getElementById("profile_pic").innerHTML =
+              name[0] + name[1];
+
+            document.getElementById("wallet_address").innerHTML =
+              "Wallet Address: " +
+              walletadress[0] +
+              walletadress[1] +
+              walletadress[2] +
+              walletadress[3] +
+              walletadress[4] +
+              walletadress[5] +
+              walletadress[6] +
+              walletadress[7] +
+              walletadress[8] +
+              walletadress[9] +
+              walletadress[10] +
+              walletadress[11] +
+              "...." +
+              walletadress[walletadress.length - 7] +
+              walletadress[walletadress.length - 6] +
+              walletadress[walletadress.length - 5] +
+              walletadress[walletadress.length - 4] +
+              walletadress[walletadress.length - 3] +
+              walletadress[walletadress.length - 2] +
+              walletadress[walletadress.length - 1];
+          })
+          .catch((error) => {
+            document.getElementById("wallet_address").innerHTML =
+              "Error: " + error.message;
+          });
+      }
+
+      const lucid = await Lucid.new(
+        new Blockfrost(
+          "https://cardano-preprod.blockfrost.io/api/v0",
+          env.BLOCKFROST_PROJECT_ID
+        ),
+
+        env.BLOCKFROST_NETWORK
+      );
+
+      const api = await window.cardano.nami.enable(); // Assuming Nami wallet is used
+      await lucid.selectWallet(api);
+
+      // Get the wallet address
+      const walletAddress = await lucid.wallet.address();
+
+      checkUserEndpoint(walletAddress);
+    </script>
+  </body>
+</html>

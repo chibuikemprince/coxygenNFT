@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coxygen Cardano NFT Marketplace</title>
+    <script src="./js/env.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+
+      header {
+        background-color: #1f1d2b;
+        color: white;
+        padding: 20px 0;
+      }
+      h1 {
+        margin: 0;
+        font-size: 2.5em;
+      }
+
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: white;
+        color: #1f1d2b;
+      }
+      .hero img {
+        width: 50%;
+        height: auto;
+        border-radius: 10px;
+      }
+      .hero-content {
+        width: 50%;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.1); /* Transparent background */
+        border-radius: 10px;
+      }
+      button {
+        padding: 15px 30px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Welcome to the Coxygen Cardano NFT Marketplace</h1>
+    </header>
+    <div class="hero">
+      <img src="./images/banner.jpg" alt="Cardano NFT" />
+      <div class="hero-content">
+        <h2>Your Gateway to Unique Digital Assets</h2>
+        <p>
+          Explore, buy, and sell NFTs on the Cardano blockchain. Join a vibrant
+          community of creators and collectors at Coxygen.
+        </p>
+        <button id="connect-wallet">Connect Wallet</button>
+      </div>
+    </div>
+    <script type="module">
+      import {
+        Blockfrost,
+        Lucid,
+      } from "https://unpkg.com/lucid-cardano/web/mod.js";
+
+      // Initialize Lucid with Blockfrost
+      const lucid = await Lucid.new(
+        new Blockfrost(
+          "https://cardano-preprod.blockfrost.io/api/v0",
+          env.BLOCKFROST_PROJECT_ID
+        ),
+
+        env.BLOCKFROST_NETWORK
+      );
+
+      async function connectWallet() {
+        // Enable the wallet
+        document.querySelector("#connect-wallet").innerText =
+          "Connecting Wallet.....";
+
+        const api = await window.cardano.nami.enable(); // Assuming Nami wallet is used
+        await lucid.selectWallet(api);
+
+        // Get the wallet address
+        const walletAddress = await lucid.wallet.address();
+        document.querySelector("#connect-wallet").innerText = "COnnect Wallet";
+        console.log(`Connected wallet: ${walletAddress}`);
+        checkUserEndpoint(walletAddress);
+      }
+
+      document.getElementById("connect-wallet").onclick = connectWallet;
+
+      function checkUserEndpoint(walletadress) {
+        fetch(env.BASE_URL + "/users/" + walletadress)
+          .then((response) => {
+            console.log({ response, status: response.status });
+            if (response.status === 200) {
+              // Redirect to dashboard.html if the status is 200
+              window.location.href = "dashboard.html";
+            } else if (response.status === 404) {
+              // Redirect to reg.html if the status is 404
+              window.location.href = "reg.html";
+            } else {
+              // Handle other statuses if necessary
+              console.error("Unexpected response status:", response.status);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching the endpoint:", error);
+            // Optionally redirect to reg.html or handle the error as needed
+            // window.location.href = "reg.html";
+          });
+      }
+    </script>
+  </body>
+</html>
